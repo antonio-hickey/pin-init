@@ -12,12 +12,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Wrapper<T>` trait added for creating wrapper structs with a structurally pinned value.
 - `MaybeZeroable` derive macro to try to derive `Zeroable`, but not error if not all fields
   implement it.
+- `unsafe fn cast_[pin_]init()` functions to unsafely change the initialized type of an initializer
 
 ### Changed
 
 - `InPlaceInit` now only exists when the `alloc` or `std` features are enabled
 - added support for visibility in `Zeroable` derive macro
 - added support for `union`s in `Zeroable` derive macro
+- renamed the crate from `pinned-init` to `pin-init` and `pinned-init-macro` to `pin-init-internal`
+
+### Fixed
+
+- `Zeroable` implementation for `Option<Box<T>>` & `Option<NonNull<T>>` to only allow `T: Sized`
+  (soundness issue)
 
 ## [0.0.9] - 2024-12-02
 
