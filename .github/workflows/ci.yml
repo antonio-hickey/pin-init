@@ -167,3 +167,31 @@ jobs:
           ref: ${{github.event.pull_request.head.sha}}
       - run: git config user.name "github-runner" && git config user.email "<>"
       - run: git rebase --exec 'git log -1 --pretty=format:%B | grep -q "^Signed-off-by:"' --root
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: Rust-for-Linux/linux
+          path: "kernel"
+          ref: pin-init-next
+      - uses: actions/checkout@v4
+        with:
+          path: "pin-init"
+          fetch-depth: 0
+          ref: ${{github.event.pull_request.head.sha}}
+      - run: |
+          pushd kernel
+          git config user.name "github-runner" && git config user.email "<>"
+          popd # kernel
+
+          pushd pin-init
+          git config user.name "github-runner" && git config user.email "<>"
+          git fetch
+          if ! yes | bash ./to-kernel.sh ../kernel origin/next; then
+              if ! git am --3way; then
+                  git am --show-current-patch=diff
+                  false
+              fi
+              false
+          fi
