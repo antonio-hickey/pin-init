@@ -60,7 +60,8 @@ head=$(git rev-parse HEAD)
 git am                                              \
     --signoff                                       \
     --directory="rust/pin-init"                     \
-    --exclude="rust/pin-init/sync-kernel.sh"        \
+    --exclude="rust/pin-init/to-kernel.sh"          \
+    --exclude="rust/pin-init/from-kernel.sh"        \
     --exclude="rust/pin-init/LICENSE-APACHE"        \
     --exclude="rust/pin-init/LICENSE-MIT"           \
     --exclude="rust/pin-init/CHANGELOG.md"          \
