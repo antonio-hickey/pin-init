@@ -40,7 +40,7 @@ jobs:
         with:
           components: rust-src
       - run: git config user.name "github-runner" && git config user.email "<>"
-      - run: git rebase --exec 'cargo doc --no-deps' --root 
+      - run: git rebase --exec 'cargo doc --no-deps' --root
   clippy:
     runs-on: ubuntu-latest
     steps:
@@ -195,3 +195,17 @@ jobs:
               fi
               false
           fi
+  link-heartbeat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: ${{github.event.pull_request.commits}}
+          ref: ${{github.event.pull_request.head.sha}}
+      - uses: dtolnay/rust-toolchain@nightly
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+      - run: sudo apt-get install -y linkchecker
+      - run: git config user.name "github-runner" && git config user.email "<>"
+      - run: git rebase --exec 'cargo doc --no-deps && linkchecker target/doc/*/*.html' --root
