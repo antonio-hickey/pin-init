@@ -1,4 +1,5 @@
 #![cfg_attr(RUSTC_USE_FEATURE, feature(lint_reasons))]
+#![cfg_attr(RUSTC_USE_FEATURE, feature(raw_ref_op))]
 
 use pin_init::{pin_data, pin_init, PinInit};
 
