@@ -15,8 +15,7 @@ jobs:
         with:
           components: rustfmt
       - run: git config user.name "github-runner" && git config user.email "<>"
-      - run: git rebase --exec 'cargo fmt --check' --root
-      - run: git rebase --exec 'cd internal && cargo fmt --check' --root
+      - run: git rebase --exec 'cargo fmt --check --all' --root
   readme:
     runs-on: ubuntu-latest
     steps:
