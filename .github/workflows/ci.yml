@@ -39,7 +39,7 @@ jobs:
         with:
           components: rust-src
       - run: git config user.name "github-runner" && git config user.email "<>"
-      - run: git rebase --exec 'cargo doc --no-deps' --root
+      - run: git rebase --exec 'cargo doc --all-features --no-deps' --root
   clippy:
     runs-on: ubuntu-latest
     steps:
@@ -52,7 +52,10 @@ jobs:
           components: clippy
       - run: cargo install cargo-hack
       - run: git config user.name "github-runner" && git config user.email "<>"
-      - run: git rebase --exec 'cargo hack --clean-per-run --feature-powerset clippy --locked' --exec 'cargo clean' --root
+      # examples and tests require `alloc`, since they make extensive use of `Box` etc.
+      - run: git rebase --exec 'cargo hack --clean-per-run --feature-powerset clippy --all-targets --locked --features alloc' --exec 'cargo clean' --root
+      # the core lib does not, so also check that without the alloc feature.
+      - run: git rebase --exec 'cargo hack --clean-per-run --feature-powerset clippy --lib --locked' --exec 'cargo clean' --root
   test:
     runs-on: ubuntu-latest
     steps:
@@ -62,10 +65,15 @@ jobs:
           components: rust-src
       - run: cargo install cargo-expand
       - run: git config user.name "github-runner" && git config user.email "<>"
-      - run: git rebase --exec 'cargo test --locked' --root
+      - run: git rebase --exec 'cargo test --locked --all-targets' --root
+      # doctests are strangely not included in --all-targets
+      - run: git rebase --exec 'cargo test --locked --doc' --root
   miri:
     runs-on: ubuntu-latest
-    name: "miri"
+    name: "miri (${{matrix.MIRIFLAGS}})"
+    strategy:
+      matrix:
+        MIRIFLAGS: ["", "-Zmiri-tree-borrows", "-Zmiri-strict-provenance", "-Zmiri-tree-borrows -Zmiri-strict-provenance"]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -80,18 +88,18 @@ jobs:
           components: miri, rust-src
       - run: cargo install cargo-expand
       - run: git config user.name "github-runner" && git config user.email "<>"
-      - run: git rebase --exec 'cargo miri test --locked' --root
-      - run: git rebase --exec 'cargo miri test --locked' --root
+      - run: git rebase --exec 'cargo miri test --locked --all-targets' --root
         env:
-          MIRIFLAGS: "-Zmiri-tree-borrows"
-      - run: git rebase --exec 'cargo miri test --locked' --root
+          MIRIFLAGS: ${{matrix.MIRIFLAGS}}
+      # doctests are strangely not included in --all-targets
+      - run: git rebase --exec 'cargo miri test --locked --doc' --root
         env:
-          MIRIFLAGS: "-Zmiri-strict-provenance"
-      - run: git rebase --exec 'cargo miri test --locked' --root
-        env:
-          MIRIFLAGS: "-Zmiri-tree-borrows -Zmiri-strict-provenance"
+          MIRIFLAGS: ${{matrix.MIRIFLAGS}}
   sanitizers:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        targets: ["--doc", "--all-targets"]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -109,7 +117,17 @@ jobs:
         env:
           ASAN_OPTIONS: "detect_odr_violation=0:detect_leaks=0"
           RUSTFLAGS: "--cfg NO_UI_TESTS --cfg NO_ALLOC_FAIL_TESTS -Z sanitizer=address"
-      - run: git rebase --exec 'cargo test --target x86_64-unknown-linux-gnu' --root
+      # sed because of https://github.com/japaric/rust-san#unrealiable-leaksanitizer
+      # doctests are strangely not included in --all-targets
+      - run: git rebase --exec "sed -i '/\[features\]/i [profile.dev]' Cargo.toml && sed -i '/profile.dev/a opt-level = 1' Cargo.toml && cargo test --doc --target x86_64-unknown-linux-gnu && git restore Cargo.toml" --root
+        env:
+          ASAN_OPTIONS: "detect_odr_violation=0:detect_leaks=0"
+          RUSTFLAGS: "--cfg NO_UI_TESTS --cfg NO_ALLOC_FAIL_TESTS -Z sanitizer=address"
+      - run: git rebase --exec 'cargo test --all-targets --target x86_64-unknown-linux-gnu' --root
+        env:
+          RUSTFLAGS: "--cfg NO_UI_TESTS --cfg NO_ALLOC_FAIL_TESTS -Z sanitizer=leak"
+      # doctests are strangely not included in --all-targets
+      - run: git rebase --exec 'cargo test --doc --target x86_64-unknown-linux-gnu' --root
         env:
           RUSTFLAGS: "--cfg NO_UI_TESTS --cfg NO_ALLOC_FAIL_TESTS -Z sanitizer=leak"
   msrv:
@@ -122,7 +140,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo install cargo-hack
       - run: git config user.name "github-runner" && git config user.email "<>"
-      - run: git rebase --exec 'cargo hack --clean-per-run --feature-powerset --exclude-features alloc --exclude-features default --version-range 1.82.. --clean-per-version check --locked' --exec 'cargo clean' --root
+      - run: git rebase --exec 'cargo hack --clean-per-run --feature-powerset --exclude-features alloc --exclude-features default --version-range 1.82.. --clean-per-version check --locked --all-targets' --exec 'cargo clean' --root
   nightly-msrv:
     runs-on: ubuntu-latest
     steps:
@@ -136,7 +154,7 @@ jobs:
       - run: cargo install cargo-hack
       - run: cargo install cargo-expand
       - run: git config user.name "github-runner" && git config user.email "<>"
-      - run: git rebase --exec 'cargo hack --clean-per-run --feature-powerset --version-range 1.78.. --clean-per-version check --locked' --exec 'cargo clean' --root
+      - run: git rebase --exec 'cargo hack --clean-per-run --feature-powerset --version-range 1.78.. --clean-per-version check --locked --all-targets' --exec 'cargo clean' --root
         env:
           RUSTC_BOOTSTRAP: 1
   os-check:
@@ -156,7 +174,9 @@ jobs:
           components: rust-src
       - run: cargo install cargo-expand
       - run: git config user.name "github-runner" && git config user.email "<>"
-      - run: git rebase --exec 'cargo test --locked' --root
+      - run: git rebase --exec 'cargo test --all-targets --locked' --root
+      # doctests are strangely not included in --all-targets
+      - run: git rebase --exec 'cargo test --doc --locked' --root
   signed-off-by:
     runs-on: ubuntu-latest
     steps:
@@ -207,4 +227,4 @@ jobs:
           components: rust-src
       - run: sudo apt-get install -y linkchecker
       - run: git config user.name "github-runner" && git config user.email "<>"
-      - run: git rebase --exec 'cargo doc --no-deps && linkchecker target/doc/*/*.html' --root
+      - run: git rebase --exec 'cargo doc --all-features --no-deps && linkchecker target/doc/*/*.html' --root
