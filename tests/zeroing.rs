@@ -1,6 +1,6 @@
 #![cfg_attr(not(RUSTC_LINT_REASONS_IS_STABLE), feature(lint_reasons))]
 
-use std::{marker::PhantomPinned, ptr::addr_of_mut};
+use core::{marker::PhantomPinned, ptr::addr_of_mut};
 
 use pin_init::*;
 
@@ -30,6 +30,7 @@ impl Foo {
 }
 
 #[test]
+#[cfg(any(feature = "std", feature = "alloc"))]
 fn test() {
     let _ = Box::pin_init(Foo::new()).unwrap();
 }

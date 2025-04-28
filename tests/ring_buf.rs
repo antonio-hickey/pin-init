@@ -2,6 +2,8 @@
 #![cfg_attr(not(RUSTC_LINT_REASONS_IS_STABLE), feature(lint_reasons))]
 #![cfg_attr(feature = "alloc", feature(allocator_api))]
 
+#[cfg(all(not(feature = "std"), feature = "alloc"))]
+use alloc::sync::Arc;
 use core::{
     convert::Infallible,
     marker::PhantomPinned,
@@ -10,9 +12,12 @@ use core::{
     ptr::{self, addr_of_mut},
 };
 use pin_init::*;
+#[cfg(feature = "std")]
 use std::sync::Arc;
+#[cfg(all(not(feature = "std"), feature = "alloc"))]
+extern crate alloc;
 
-#[expect(unused_attributes)]
+#[allow(unused_attributes)]
 #[path = "../examples/error.rs"]
 mod error;
 use error::Error;
@@ -206,6 +211,7 @@ fn even_failing() {
 }
 
 #[test]
+#[cfg(any(feature = "std", feature = "alloc"))]
 fn with_failing_inner() {
     let mut buf = Box::pin_init(RingBuffer::<EvenU64, 4>::new()).unwrap();
     assert_eq!(buf.as_mut().try_push(EvenU64::new(0)), Ok(true));
@@ -240,7 +246,7 @@ fn with_failing_inner() {
     assert_eq!(buf.as_mut().pop(), None);
 }
 
-#[cfg_attr(miri, allow(dead_code))]
+#[allow(dead_code)]
 #[derive(Debug)]
 struct BigStruct {
     buf: [u8; 1024 * 1024],
@@ -265,7 +271,7 @@ fn big_struct() {
 #[cfg(all(any(feature = "std", feature = "alloc"), not(miri)))]
 #[test]
 fn with_big_struct() {
-    #[expect(unused_attributes)]
+    #[allow(unused_attributes)]
     #[path = "../examples/mutex.rs"]
     mod mutex;
     use mutex::*;
