@@ -5,9 +5,9 @@ on:
     branches: [kernel]
   schedule:
     - cron: '7 7 * * *'
-name: kernel
+name: sync-check
 jobs:
-  sync:
+  torvalds:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
