@@ -40,7 +40,7 @@ jobs:
           repository: "Rust-for-Linux/linux"
           ref: pin-init-next
           path: kernel
-      - run:
+      - run: |
           cp -r linux/rust/pin-init .
           cd pin-init
           if ! git diff --quiet ; then
