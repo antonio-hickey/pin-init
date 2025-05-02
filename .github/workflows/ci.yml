@@ -2,6 +2,8 @@ permissions:
   contents: read
 on:
   pull_request:
+  workflow_dispatch:
+
 name: CI
 jobs:
   fmt:

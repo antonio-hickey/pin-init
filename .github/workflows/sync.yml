@@ -5,6 +5,8 @@ on:
     branches: [kernel, next]
   schedule:
     - cron: '7 7 * * *'
+  workflow_dispatch:
+
 name: sync-check
 jobs:
   torvalds:
