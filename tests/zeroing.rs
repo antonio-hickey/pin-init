@@ -1,3 +1,4 @@
+#![feature(raw_ref_op)]
 #![cfg_attr(not(RUSTC_LINT_REASONS_IS_STABLE), feature(lint_reasons))]
 
 use std::marker::PhantomPinned;
