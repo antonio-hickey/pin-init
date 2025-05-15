@@ -12,7 +12,7 @@ fn main() {
     if version().unwrap() >= Version::parse("1.82.0").unwrap() {
         println!("cargo:rustc-cfg=RUSTC_NEW_UNINIT_IS_STABLE");
     }
-    if version().unwrap() >= Version::parse("1.88.0-nightly").unwrap() {
+    if version().unwrap() >= Version::parse("1.89.0-nightly").unwrap() {
         println!("cargo:rustc-cfg=CONFIG_RUSTC_HAS_UNSAFE_PINNED");
     }
 }
