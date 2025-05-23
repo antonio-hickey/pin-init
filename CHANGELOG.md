@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - renamed the crate from `pinned-init` to `pin-init` and `pinned-init-macro` to `pin-init-internal`
 - blanket impls of `Init` and `PinInit` from `impl<T, E> [Pin]Init<T, E> for T` to
   `impl<T> [Pin]Init<T> for T`
+- renamed `zeroed()` to `init_zeroed()`
 
 ### Fixed
 
