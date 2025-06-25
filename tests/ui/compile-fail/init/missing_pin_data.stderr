@@ -11,9 +11,3 @@ error[E0599]: no associated item named `__pin_data` found for struct `Foo` in th
   = note: the following trait defines an item `__pin_data`, perhaps you need to implement it:
           candidate #1: `HasPinData`
   = note: this error originates in the macro `$crate::try_pin_init` which comes from the expansion of the macro `pin_init` (in Nightly builds, run with -Z macro-backtrace for more info)
-help: there is an associated function `__init_data` with a similar name
- --> src/lib.rs
-  |
-  -             @has_data(HasPinData, __pin_data),
-  +             @has_data(HasPinData, __init_data),
-  |
