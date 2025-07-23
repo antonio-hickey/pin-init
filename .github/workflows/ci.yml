@@ -1,8 +1,12 @@
 permissions:
   contents: read
 on:
+  push:
+    branches: [main, kernel, next]
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: '7 7 * * *'
 
 name: CI
 jobs:
@@ -254,3 +258,15 @@ jobs:
       - run: git rebase --exec 'cargo doc --all-features --no-deps && linkchecker target/doc/*/*.html' --root
         env:
           RUSTFLAGS: "-Dwarnings"
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+      - run: cargo install cargo-expand
+      - run: cargo update
+      - run: cargo test --locked
+        env:
+          RUSTFLAGS: "-Ddeprecated -Dwarnings"
