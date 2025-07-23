@@ -164,6 +164,7 @@ pub struct EvenU64 {
 }
 
 impl EvenU64 {
+    #[allow(clippy::manual_is_multiple_of)]
     pub fn new2(value: u64) -> impl Init<Self, Error> {
         try_init!(Self {
             info: "Hello world!".to_owned(),
@@ -174,6 +175,8 @@ impl EvenU64 {
             },
         }? Error)
     }
+
+    #[allow(clippy::manual_is_multiple_of)]
     pub fn new(value: u64) -> impl Init<Self, ()> {
         try_init!(Self {
             info: "Hello world!".to_owned(),
