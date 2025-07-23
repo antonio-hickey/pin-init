@@ -209,7 +209,7 @@ jobs:
           fetch-depth: ${{github.event.pull_request.commits}}
           ref: ${{github.event.pull_request.head.sha}}
       - run: git config user.name "github-runner" && git config user.email "<>"
-      - run: git rebase --exec 'git log -1 --pretty=format:%B | grep -q "^Signed-off-by:"' --root
+      - run: git rebase --exec 'git log --no-merges -1 --pretty=format:%B | grep -q "^Signed-off-by:"' --root
   apply:
     runs-on: ubuntu-latest
     steps:
