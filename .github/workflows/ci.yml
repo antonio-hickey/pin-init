@@ -206,6 +206,7 @@ jobs:
         env:
           RUSTFLAGS: "-Dwarnings"
   signed-off-by:
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
