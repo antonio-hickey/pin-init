@@ -139,6 +139,40 @@ jobs:
           git rebase --exec "bash exec.sh" --root
         env:
           RUSTFLAGS: "-Dwarnings"
+  beta:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        kind:
+          - "check --all-targets"
+          - "test --all-targets"
+          # doctests are strangely not included in --all-targets
+          - "--features default test --doc"
+    name: "beta/${{matrix.kind}}"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: ${{github.event.pull_request.commits}}
+          ref: ${{github.event.pull_request.head.sha}}
+      - uses: dtolnay/rust-toolchain@beta
+        with:
+          components: rust-src
+      - run: cargo install cargo-expand
+      - run: cargo install cargo-hack
+      - run: git config user.name "github-runner" && git config user.email "<>"
+      - run: |
+          echo '#!/bin/bash
+          set -e
+          cargo hack \
+            --clean-per-run \
+            --feature-powerset \
+            ${{matrix.kind}} \
+            --locked
+          cargo clean' > exec.sh
+          git rebase --exec "bash exec.sh" --root
+        env:
+          RUSTFLAGS: "-Dwarnings"
+          RUSTC_BOOTSTRAP: 1
   miri:
     runs-on: ubuntu-latest
     name: "miri (${{matrix.MIRIFLAGS}})"
