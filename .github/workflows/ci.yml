@@ -106,8 +106,16 @@ jobs:
           RUSTFLAGS: >
             -Dwarnings
             --cfg UI_TESTS
-  tests:
+  nightly:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        kind:
+          - "check --all-targets"
+          - "test --all-targets"
+          # doctests are strangely not included in --all-targets
+          - "--features default test --doc"
+    name: "nightly/${{matrix.kind}}"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -117,15 +125,18 @@ jobs:
         with:
           components: rust-src
       - run: cargo install cargo-expand
+      - run: cargo install cargo-hack
       - run: git config user.name "github-runner" && git config user.email "<>"
-      - run: git rebase --exec 'cargo check --locked --all-targets' --root
-        env:
-          RUSTFLAGS: "-Dwarnings"
-      - run: git rebase --exec 'cargo test --locked --all-targets' --root
-        env:
-          RUSTFLAGS: "-Dwarnings"
-      # doctests are strangely not included in --all-targets
-      - run: git rebase --exec 'cargo test --locked --doc' --root
+      - run: |
+          echo '#!/bin/bash
+          set -e
+          cargo hack \
+            --clean-per-run \
+            --feature-powerset \
+            ${{matrix.kind}} \
+            --locked
+          cargo clean' > exec.sh
+          git rebase --exec "bash exec.sh" --root
         env:
           RUSTFLAGS: "-Dwarnings"
   miri:
