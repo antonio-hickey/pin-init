@@ -294,7 +294,7 @@ jobs:
         env:
           RUSTFLAGS: "-Dwarnings"
   signed-off-by:
-    if: github.event_name != 'schedule'
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
