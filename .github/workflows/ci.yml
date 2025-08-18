@@ -161,7 +161,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo install cargo-hack
       - run: git config user.name "github-runner" && git config user.email "<>"
-      - run: git rebase --exec 'cargo hack --clean-per-run --feature-powerset --exclude-features alloc --exclude-features default --version-range 1.82.. --clean-per-version check --locked --all-targets' --exec 'cargo clean' --root
+      - run: git rebase --exec 'cargo hack --clean-per-run --feature-powerset --exclude-features unsafe-pinned --exclude-features alloc --exclude-features default --version-range 1.82.. --clean-per-version check --locked --all-targets' --exec 'cargo clean' --root
         env:
           RUSTFLAGS: "-Dwarnings"
   nightly-msrv:
