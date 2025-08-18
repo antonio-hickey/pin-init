@@ -118,6 +118,9 @@ jobs:
           components: rust-src
       - run: cargo install cargo-expand
       - run: git config user.name "github-runner" && git config user.email "<>"
+      - run: git rebase --exec 'cargo check --locked --all-targets' --root
+        env:
+          RUSTFLAGS: "-Dwarnings"
       - run: git rebase --exec 'cargo test --locked --all-targets' --root
         env:
           RUSTFLAGS: "-Dwarnings"
