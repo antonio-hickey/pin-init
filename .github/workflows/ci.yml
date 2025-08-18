@@ -392,6 +392,10 @@ jobs:
           pushd pin-init
           git config user.name "github-runner" && git config user.email "<>"
           git fetch
+          if [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/next)" ]; then
+              # when there are no new commits, we can succeed directly
+              exit 0
+          fi
           if ! yes | bash ./to-kernel.sh ../kernel origin/next; then
               if ! git am --3way; then
                   git am --show-current-patch=diff
