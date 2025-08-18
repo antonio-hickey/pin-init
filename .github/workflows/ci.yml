@@ -89,7 +89,24 @@ jobs:
           git rebase --exec "bash exec.sh" --root
         env:
           RUSTFLAGS: "-Dwarnings"
-  test:
+  ui-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: ${{github.event.pull_request.commits}}
+          ref: ${{github.event.pull_request.head.sha}}
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+      - run: cargo install cargo-expand
+      - run: git config user.name "github-runner" && git config user.email "<>"
+      - run: git rebase --exec 'cargo test ui_ --locked --all-targets' --root
+        env:
+          RUSTFLAGS: >
+            -Dwarnings
+            --cfg UI_TESTS
+  tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -170,7 +187,6 @@ jobs:
         env:
           ASAN_OPTIONS: "detect_odr_violation=0:detect_leaks=0"
           RUSTFLAGS: >
-            --cfg NO_UI_TESTS
             --cfg NO_ALLOC_FAIL_TESTS
             -Z sanitizer=address
             -Dwarnings
@@ -187,7 +203,6 @@ jobs:
         env:
           ASAN_OPTIONS: "detect_odr_violation=0:detect_leaks=0"
           RUSTFLAGS: >
-            --cfg NO_UI_TESTS
             --cfg NO_ALLOC_FAIL_TESTS
             -Z sanitizer=address
             -Dwarnings
@@ -197,7 +212,6 @@ jobs:
             --root
         env:
           RUSTFLAGS: >
-            --cfg NO_UI_TESTS
             --cfg NO_ALLOC_FAIL_TESTS
             -Z sanitizer=leak
             -Dwarnings
@@ -208,7 +222,6 @@ jobs:
             --root
         env:
           RUSTFLAGS: >
-            --cfg NO_UI_TESTS
             --cfg NO_ALLOC_FAIL_TESTS
             -Z sanitizer=leak
             -Dwarnings
