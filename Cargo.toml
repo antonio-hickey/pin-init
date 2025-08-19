@@ -1,6 +1,6 @@
 [package]
 name = "pin-init"
-version = "0.0.9"
+version = "0.0.10"
 edition = "2021"
 
 authors = ["y86-dev"]
@@ -15,7 +15,7 @@ categories = ["no-std", "rust-patterns", "embedded"]
 
 [dependencies]
 paste = "1.0"
-pin-init-internal = { path = "./internal", version = "=0.0.5" }
+pin-init-internal = { path = "./internal", version = "=0.0.6" }
 
 [features]
 default = ["std", "alloc"]
