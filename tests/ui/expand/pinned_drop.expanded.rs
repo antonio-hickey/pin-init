@@ -50,12 +50,24 @@ const _: () = {
         ) -> ::core::result::Result<(), E> {
             unsafe { ::pin_init::PinInit::__pinned_init(init, slot) }
         }
+        unsafe fn __project__pin<'__slot>(
+            self,
+            slot: &'__slot mut PhantomPinned,
+        ) -> ::core::pin::Pin<&'__slot mut PhantomPinned> {
+            ::core::pin::Pin::new_unchecked(slot)
+        }
         unsafe fn array<E>(
             self,
             slot: *mut [u8; 1024 * 1024],
             init: impl ::pin_init::Init<[u8; 1024 * 1024], E>,
         ) -> ::core::result::Result<(), E> {
             unsafe { ::pin_init::Init::__init(init, slot) }
+        }
+        unsafe fn __project_array<'__slot>(
+            self,
+            slot: &'__slot mut [u8; 1024 * 1024],
+        ) -> &'__slot mut [u8; 1024 * 1024] {
+            slot
         }
     }
     unsafe impl ::pin_init::__internal::HasPinData for Foo {
