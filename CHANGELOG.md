@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - `#[pin_data]` now generates a `*Projection` struct similar to the `pin-project` crate.
+- Add initializer code blocks to `[try_][pin_]init!` macros: make initializer
+  macros accept any number of `_: {/* arbitrary code */},` & make them run the
+  code at that point.
 
 ## [0.0.10] - 2025-08-19
 
