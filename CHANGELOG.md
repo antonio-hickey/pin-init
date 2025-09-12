@@ -13,9 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add initializer code blocks to `[try_][pin_]init!` macros: make initializer
   macros accept any number of `_: {/* arbitrary code */},` & make them run the
   code at that point.
-- Allow users to specify `#[bind]` on field assignments in `[try_][pin_]init!`
-  macros. Doing so exposes the marked field via a `let` binding as `&mut T` or
-  `Pin<&mut T>`.
+- Make the `[try_][pin_]init!` macros expose initialized fields via a `let`
+  binding as `&mut T` or `Pin<&mut T>` for later fields.
 
 ## [0.0.10] - 2025-08-19
 
