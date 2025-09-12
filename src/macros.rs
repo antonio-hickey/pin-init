@@ -1457,6 +1457,20 @@ macro_rules! __init_internal {
     (make_initializer:
         @slot($slot:ident),
         @type_name($t:path),
+        @munch_fields(_: { $($code:tt)* }, $($rest:tt)*),
+        @acc($($acc:tt)*),
+    ) => {
+        // code blocks are ignored for the initializer check
+        $crate::__init_internal!(make_initializer:
+            @slot($slot),
+            @type_name($t),
+            @munch_fields($($rest)*),
+            @acc($($acc)*),
+        );
+    };
+    (make_initializer:
+        @slot($slot:ident),
+        @type_name($t:path),
         @munch_fields(..Zeroable::init_zeroed() $(,)?),
         @acc($($acc:tt)*),
     ) => {
@@ -1507,20 +1521,6 @@ macro_rules! __init_internal {
                 });
             );
         }
-    };
-    (make_initializer:
-        @slot($slot:ident),
-        @type_name($t:path),
-        @munch_fields(_: { $($code:tt)* }, $($rest:tt)*),
-        @acc($($acc:tt)*),
-    ) => {
-        // code blocks are ignored for the initializer check
-        $crate::__init_internal!(make_initializer:
-            @slot($slot),
-            @type_name($t),
-            @munch_fields($($rest)*),
-            @acc($($acc)*),
-        );
     };
     (make_initializer:
         @slot($slot:ident),
