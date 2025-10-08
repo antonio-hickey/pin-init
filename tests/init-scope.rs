@@ -1,0 +1,30 @@
+#![allow(dead_code)]
+#![cfg_attr(not(RUSTC_LINT_REASONS_IS_STABLE), feature(lint_reasons))]
+
+use pin_init::*;
+
+#[pin_data]
+pub struct MyStruct {
+    a: usize,
+    b: isize,
+}
+
+fn foo() -> Result<usize, ()> {
+    Ok(0)
+}
+
+impl MyStruct {
+    pub fn new() -> impl Init<Self, ()> {
+        init_scope(|| {
+            let a = foo()?;
+            Ok(try_init!(Self { a, b: 42 }?()))
+        })
+    }
+
+    pub fn new2() -> impl PinInit<Self, ()> {
+        pin_init_scope(|| {
+            let a = foo()?;
+            Ok(try_pin_init!(Self { a, b: 42 }?()))
+        })
+    }
+}
