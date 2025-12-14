@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `[pin_]init_scope` functions to run arbitrary code inside of an initializer.
+
 ### Changed
 
 - `#[pin_data]` now generates a `*Projection` struct similar to the `pin-project` crate.
