@@ -40,3 +40,17 @@ const _: () = {
         assert_zeroable::<&'a U>();
     }
 };
+struct WithGenericsMaybe<'a, T, U: Trait> {
+    a: T,
+    u: &'a U,
+}
+#[automatically_derived]
+unsafe impl<
+    'a,
+    T: ::pin_init::Zeroable,
+    U: ::pin_init::Zeroable + Trait,
+> ::pin_init::Zeroable for WithGenericsMaybe<'a, T, U>
+where
+    T: for<'__dummy> ::pin_init::Zeroable,
+    &'a U: for<'__dummy> ::pin_init::Zeroable,
+{}
