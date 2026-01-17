@@ -19,3 +19,9 @@ struct WithGenerics<'a, T, U: Trait> {
     a: T,
     u: &'a U,
 }
+
+#[derive(MaybeZeroable)]
+struct WithGenericsMaybe<'a, T, U: Trait> {
+    a: T,
+    u: &'a U,
+}
