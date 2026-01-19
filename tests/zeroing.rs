@@ -1,4 +1,4 @@
-#![cfg_attr(not(RUSTC_LINT_REASONS_IS_STABLE), feature(lint_reasons))]
+#![cfg_attr(RUSTC_USE_FEATURE, feature(lint_reasons))]
 
 use core::{marker::PhantomPinned, ptr::addr_of_mut};
 
